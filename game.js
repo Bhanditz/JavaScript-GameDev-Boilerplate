@@ -52,8 +52,20 @@ function main() {
   // load images (by source path) into the Image objects.
   // Ex:
   //  var imageLoader = new ImageLoader();
+  //  var playerImage = new Image();
   //  imageLoader.loadImage(playerImage, "./playerSprite.png");
   var imageLoader = new ImageLoader();
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -75,13 +87,19 @@ function main() {
 
 
 
+
+
+
+
+
+
+
   }
 
-
-  // when all the images are loaded, start the drawFrame function at 60 frames
+  // when all the images are loaded, start the drawFrame function at 30 frames
   // per second.
   imageLoader.onImagesLoaded(function() {
-    setInterval(drawFrame, 1000 / 60)
+    setInterval(drawFrame, 1000 / 30)
   });
 
 
@@ -90,12 +108,12 @@ function main() {
   // space bar is pressed down. The onSpacebarUp function will be called ONCE
   // when the space bar is released.
 
-  function onSpacebarDown() {
+  function onSpaceBarDown() {
 
     // put here things you want to happen when the space bar is pressed
 
   }
-  function onSpacebarUp() {
+  function onSpaceBarUp() {
 
     // put here things you want to happen when the space bar is released
 
@@ -144,22 +162,42 @@ function main() {
   // this assigns event listeners to actually call the control functions
   window.onkeydown = function(e) {
     switch (e.keyCode) {
-      case 32: onSpaceBarDown()
-      case 37: onLeftArrowDown()
-      case 38: onUpArrowDown()
-      case 39: onRightArrowDown()
-      case 40: onDownArrowDown()
+      case 32:
+        onSpaceBarDown();
+        break;
+      case 37:
+          onLeftArrowDown();
+          break;
+      case 38:
+          onUpArrowDown();
+          break;
+      case 39:
+          onRightArrowDown();
+          break;
+      case 40:
+          onDownArrowDown();
+          break;
     }
-  }
+  };
   window.onkeyup = function(e) {
     switch (e.keyCode) {
-      case 32: onSpaceBarUp()
-      case 37: onLeftArrowUp()
-      case 38: onUpArrowUp()
-      case 39: onRightArrowUp()
-      case 40: onUpArrowUp()
+      case 32:
+        onSpaceBarUp();
+        break;
+      case 37:
+        onLeftArrowUp();
+        break;
+      case 38:
+        onUpArrowUp();
+        break;
+      case 39:
+        onRightArrowUp();
+        break;
+      case 40:
+        onDownArrowUp();
+        break;
     }
-  }
+  };
 }
 
 // call the main function and run the game.
