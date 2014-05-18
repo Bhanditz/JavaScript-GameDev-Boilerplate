@@ -30,9 +30,8 @@ ImageLoader.prototype.onImagesLoaded = function(cb) {
   }
 }
 
-function checkCollision(a, b) {
-  dist = Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-  return dist < 50
+function distance(a, b) {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
 }
 
 
@@ -62,47 +61,35 @@ function main() {
   var imageLoader = new ImageLoader();
 
 
-  var playerSprite = new Image();
-  imageLoader.loadImage(playerSprite, "http://img225.imageshack.us/img225/4021/spectreb.png");
-  var bulletSprite = new Image();
-  imageLoader.loadImage(bulletSprite, "http://img3.wikia.nocookie.net/__cb20120903001531/mario/images/7/7c/SMB_Bullet_Bill_sprite.png");
-  var enemySprite = new Image();
-  imageLoader.loadImage(enemySprite, "http://i1218.photobucket.com/albums/dd420/CharzyCharChar/UnicornSprite.gif");
+  var shipImage = new Image();
+  imageLoader.loadImage(shipImage, "./ship.png");
 
-  var player = {
-    x: 20,
-    y: 40,
+  var bulletImage = new Image();
+  imageLoader.loadImage(bulletImage, "http://img2.wikia.nocookie.net/__cb20121031154849/mario/images/5/52/BulletBill-Sprite-SMB3-SNES.png");
+
+  var enemyImage = new Image();
+  imageLoader.loadImage(enemyImage, "http://fc06.deviantart.net/fs71/f/2011/208/d/4/naruto_sprite_by_st0ven-d41vukf.png");
+
+
+
+
+  var ship = {
+    x: 0,
+    y: 30,
     vy: 0,
+    vx: 0,
+    sprite: shipImage,
     draw: function() {
-      ctx.drawImage(playerSprite, this.x, this.y);
+      ctx.drawImage(this.sprite, this.x, this.y);
     },
     move: function() {
-      this.y += this.vy;
+      this.y = this.y + this.vy;
+      this.x = this.x + this.vx;
     }
-  };
+  }
 
   var bullets = [];
-
   var enemies = [];
-
-  function makeEnemy() {
-    var newEnemy = {
-      x: canvas.width,
-      y: Math.random() * canvas.height,
-      vx: -1,
-      vy: 0,
-      draw: function() {
-        ctx.drawImage(enemySprite, this.x, this.y);
-      },
-      move: function() {
-        this.vy = 2 * Math.random() - 1;
-        this.y += this.vy;
-        this.x += this.vx;
-      }
-    }
-    enemies.push(newEnemy)
-  }
-  setInterval(makeEnemy, 1500)
 
   // this function draws your frame.
   // Ex:
@@ -111,21 +98,17 @@ function main() {
   //    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 50, 50);
   //  }
   function drawFrame() {
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ship.move();
+    ship.draw();
 
-    // move and draw the player
-    player.move();
-    player.draw();
-
-    // move and draw the bullets
     for (var i=0; i < bullets.length; i++) {
       bullets[i].move();
       bullets[i].draw();
 
-      // check collision
       for (var j=0; j < enemies.length; j++) {
-        if (checkCollision(bullets[i], enemies[j])) {
+        if (distance(bullets[i], enemies[j]) < 20) {
+          // collision! Don't worry about this too much. it's tricky.
           enemies.splice(j, 1);
           bullets.splice(i, 1);
           i--;
@@ -134,24 +117,38 @@ function main() {
       }
     }
 
-    // make enemies
     for (var i=0; i < enemies.length; i++) {
       enemies[i].move();
       enemies[i].draw();
-
-      // check game over
-      if (enemies[i].x < 0) {
-        alert('GAME OVER');
-        enemies = [];
-      }
     }
 
   }
 
+  // make enemy once every 2 seconds
+  setInterval(function() {
+    enemy = {
+      x: canvas.width,
+      y: Math.random() * (canvas.height - 50),
+      vx: -1,
+      sprite: enemyImage,
+      draw: function() {
+        ctx.drawImage(this.sprite, this.x, this.y, 50, 50);
+      },
+      move: function() {
+        this.x = this.x + this.vx;
+      }
+    }
+    enemies.push(enemy);
+  }, 2000);
+
+
+
+
+
   // when all the images are loaded, start the drawFrame function at 30 frames
   // per second.
   imageLoader.onImagesLoaded(function() {
-    setInterval(drawFrame, 1000 / 30)
+    setInterval(drawFrame, 1000 / 30);
   });
 
 
@@ -163,20 +160,20 @@ function main() {
   function onSpaceBarDown() {
 
     // put here things you want to happen when the space bar is pressed
-
-    newBullet = {
-      x: player.x,
-      y: player.y,
-      vx: 6,
+    var bullet = {
+      x: ship.x + 20,
+      y: ship.y + 20,
+      vx: 5,
+      sprite: bulletImage,
       draw: function() {
-        ctx.drawImage(bulletSprite, this.x, this.y);
+        ctx.drawImage(this.sprite, this.x, this.y);
       },
       move: function() {
-        this.x += this.vx;
+        this.x = this.x + this.vx;
       }
     }
-
-    bullets.push(newBullet);
+    bullets.push(bullet);
+    console.log(bullets);
 
   }
   function onSpaceBarUp() {
@@ -187,46 +184,49 @@ function main() {
   function onLeftArrowDown() {
 
     // put here things you want to happen when the left arrow is pressed
+    ship.vx = -3;
 
   }
   function onLeftArrowUp() {
 
     // put here things you want to happen when the left arrow is released
+    ship.vx = 0;
 
   }
   function onUpArrowDown() {
 
     // put here things you want to happen when the up arrow is pressed
-    player.vy = -2;
+    ship.vy = -3;
 
   }
   function onUpArrowUp() {
 
     // put here things you want to happen when the up arrow is released
-    player.vy = 0;
+    ship.vy = 0;
 
   }
   function onRightArrowDown() {
 
     // put here things you want to happen when the right arrow is pressed
+    ship.vx = 3;
 
   }
   function onRightArrowUp() {
 
     // put here things you want to happen when the right arrow is released
+    ship.vx = 0;
 
   }
   function onDownArrowDown() {
 
     // put here things you want to happen when the left arrow is pressed
-    player.vy = 2;
+    ship.vy = 3;
 
   }
   function onDownArrowUp() {
 
     // put here things you want to happen when the left arrow is released
-    player.vy = 0;
-
+    ship.vy = 0;
   }
 
   // this assigns event listeners to actually call the control functions
